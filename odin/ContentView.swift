@@ -6,48 +6,105 @@
 //
 
 import SwiftUI
-import SwiftData
+import FeedKit
+
+struct RSSItem: Identifiable {
+    let id = UUID()
+    let title: String
+    let description: String
+    let link: String
+    let pubDate: Date
+}
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @State private var feedItems: [RSSItem] = []
+    @State private var isLoading: Bool = true
+    @State private var errorMessage: String?
 
     var body: some View {
         NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+            List(feedItems) { item in
+                NavigationLink {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(item.title)
+                            .font(.headline)
+                        Text(item.description)
+                            .font(.body)
+                        Spacer()
+                        Link("Read More", destination: URL(string: item.link)!)
+                    }
+                    .padding()
+                } label: {
+                    VStack(alignment: .leading) {
+                        Text(item.title)
+                            .font(.headline)
+                        Text(item.pubDate, format: Date.FormatStyle(date: .long, time: .shortened))
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
                     }
                 }
-                .onDelete(perform: deleteItems)
             }
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
+            .navigationTitle("Quanta RSS Feed")
             .toolbar {
                 ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Button(action: fetchFeed) {
+                        if isLoading {
+                            ProgressView()
+                        } else {
+                            Label("Refresh", systemImage: "arrow.clockwise")
+                        }
                     }
                 }
+            }
+            .alert("Error", isPresented: .constant(errorMessage != nil)) {
+                Button("OK", role: .cancel) {
+                    errorMessage = nil
+                }
+            } message: {
+                Text(errorMessage ?? "Unknown error")
             }
         } detail: {
             Text("Select an item")
         }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
+        .onAppear {
+            fetchFeed()
         }
     }
 
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+    private func fetchFeed() {
+        isLoading = true
+        errorMessage = nil
+
+        guard let feedURL = URL(string: "https://www.quantamagazine.org/quanta/feed/") else {
+            errorMessage = "Invalid feed URL"
+            isLoading = false
+            return
+        }
+
+        let parser = FeedParser(URL: feedURL)
+
+        parser.parseAsync { result in
+            DispatchQueue.main.async {
+                isLoading = false
+                switch result {
+                case .success(let feed):
+                    if let rssFeed = feed.rssFeed {
+                        feedItems = rssFeed.items?.compactMap { item in
+                            guard
+                                let title = item.title,
+                                let description = item.description,
+                                let link = item.link,
+                                let pubDate = item.pubDate
+                            else {
+                                return nil
+                            }
+                            return RSSItem(title: title, description: description, link: link, pubDate: pubDate)
+                        } ?? []
+                    }
+                case .failure(let error):
+                    errorMessage = error.localizedDescription
+                }
             }
         }
     }
@@ -55,5 +112,4 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
 }

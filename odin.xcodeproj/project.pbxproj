@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F65CB1972D3253C200DBF87E /* FeedKit in Frameworks */ = {isa = PBXBuildFile; productRef = F65CB1962D3253C200DBF87E /* FeedKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		F65CB1812D32533100DBF87E /* odin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = odin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F65CB1972D3253C200DBF87E /* FeedKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = odin;
 			packageProductDependencies = (
+				F65CB1962D3253C200DBF87E /* FeedKit */,
 			);
 			productName = odin;
 			productReference = F65CB1812D32533100DBF87E /* odin.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = F65CB1782D32533100DBF87E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F65CB1952D3253C200DBF87E /* XCRemoteSwiftPackageReference "FeedKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F65CB1822D32533100DBF87E /* Products */;
 			projectDirPath = "";
@@ -321,6 +330,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F65CB1952D3253C200DBF87E /* XCRemoteSwiftPackageReference "FeedKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/nmdias/FeedKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F65CB1962D3253C200DBF87E /* FeedKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F65CB1952D3253C200DBF87E /* XCRemoteSwiftPackageReference "FeedKit" */;
+			productName = FeedKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F65CB1792D32533100DBF87E /* Project object */;
 }
