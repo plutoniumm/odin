@@ -8,10 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		F65CB1972D3253C200DBF87E /* FeedKit in Frameworks */ = {isa = PBXBuildFile; productRef = F65CB1962D3253C200DBF87E /* FeedKit */; };
+		F65CB1A52D325BA500DBF87E /* FeedFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F65CB1A42D325BA500DBF87E /* FeedFetcher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		F65CB1812D32533100DBF87E /* odin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = odin.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F65CB1A42D325BA500DBF87E /* FeedFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedFetcher.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -37,6 +39,7 @@
 		F65CB1782D32533100DBF87E = {
 			isa = PBXGroup;
 			children = (
+				F65CB1A42D325BA500DBF87E /* FeedFetcher.swift */,
 				F65CB1832D32533100DBF87E /* odin */,
 				F65CB1822D32533100DBF87E /* Products */,
 			);
@@ -128,6 +131,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F65CB1A52D325BA500DBF87E /* FeedFetcher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
