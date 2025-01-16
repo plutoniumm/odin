@@ -1,10 +1,11 @@
 import Foundation
 import FeedKit
+import SwiftSoup
 
 struct RSSItem: Identifiable {
     let id = UUID()
     let title: String
-    let description: String
+    let description: String // Updated to store plain text
     let link: String
     let pubDate: Date
 }
@@ -49,7 +50,21 @@ class FeedFetcher: ObservableObject {
                                 else {
                                     return nil
                                 }
-                                return RSSItem(title: title, description: description, link: link, pubDate: pubDate)
+
+                                // Parse HTML to plain text using SwiftSoup
+                                let plainDescription: String
+                                do {
+                                    plainDescription = try SwiftSoup.parse(description).text()
+                                } catch {
+                                    plainDescription = description // Fallback to raw description if parsing fails
+                                }
+
+                                return RSSItem(
+                                    title: title,
+                                    description: plainDescription,
+                                    link: link,
+                                    pubDate: pubDate
+                                )
                             } ?? []
                             combinedItems.append(contentsOf: items)
                         }
@@ -59,9 +74,6 @@ class FeedFetcher: ObservableObject {
                     group.leave()
                 }
             }
-          
-          // show in console
-          NSLog("%s", urlString);
         }
 
         group.notify(queue: .main) {
