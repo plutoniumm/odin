@@ -3,7 +3,7 @@ import Foundation
 class RedditTransformer {
     static func fetchFeed(subreddit: String, completion: @escaping (Result<[RSSItem], Error>) -> Void) {
         let proxyURL = "https://x.manav.ch/p2/proxy?url="
-        let redditURL = "https://www.reddit.com/r/\(subreddit)/.json?limit=10"
+        let redditURL = "https://www.reddit.com/r/\(subreddit)/.json?limit=20"
         guard let url = URL(string: proxyURL + redditURL) else {
             completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
             return
@@ -34,7 +34,14 @@ class RedditTransformer {
                             return nil
                         }
 
-                        let body = (childData["selftext"] as? String) ?? ""
+                        var body = (childData["selftext"] as? String) ?? ""
+                        let attributedBody: AttributedString
+                        do {
+                            attributedBody = try AttributedString(markdown: body)
+                            body = String(attributedBody.description)
+                        } catch {
+                            body = String(body)
+                        }
                         if !title.contains("http") && !body.contains("http") {
                             return nil
                         }

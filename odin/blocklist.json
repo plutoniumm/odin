@@ -1,7 +1,9 @@
 
 {
-  "Quanta Magazine": ["quantum", "entanglement"],
-  "Nautilus": ["physics", "biology"],
-  "r/javascript": ["framework", "library"],
-  "r/fortran": ["obsolete", "legacy"]
+  "Construction Physics":[],
+  "Quanta Magazine": [],
+  "Nautilus": [],
+  "r/javascript": ["[AskJS]"],
+  "r/fortran": [],
+  "Terry Tao": []
 }

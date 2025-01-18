@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import AppKit
 
 class FeedFetcher: ObservableObject {
     @Published var feedItems: [RSSItem] = []
@@ -7,15 +8,47 @@ class FeedFetcher: ObservableObject {
     @Published var errorMessage: String?
 
     private var feedSources: [FeedSource] = [
-        FeedSource(name: "Quanta Magazine", type: .rss, url: "https://www.quantamagazine.org/quanta/feed/"),
-        FeedSource(name: "Nautilus", type: .rss, url: "https://nautil.us/feed/"),
-        FeedSource(name: "r/javascript", type: .reddit, url: "javascript"),
-        FeedSource(name: "r/fortran", type: .reddit, url: "fortran")
+       FeedSource(
+           name: "Terry Tao",
+           type: .rss,
+           url: "https://mathstodon.xyz/@tao.rss",
+           imageName: NSImage(named: "js")!
+       ),
+       FeedSource(
+           name: "Construction Physics",
+           type: .rss,
+           url: "https://www.construction-physics.com/feed",
+           imageName: NSImage(named: "js")!
+       ),
+        FeedSource(
+            name: "Quanta Magazine",
+            type: .rss,
+            url: "https://www.quantamagazine.org/quanta/feed/",
+            imageName: NSImage(named: "js")!
+        ),
+        FeedSource(
+            name: "Nautilus",
+            type: .rss,
+            url: "https://nautil.us/feed/",
+            imageName: NSImage(named: "js")!
+        ),
+       FeedSource(
+           name: "r/javascript",
+           type: .reddit,
+           url: "javascript",
+           imageName: NSImage(named: "js")!
+       ),
+       FeedSource(
+           name: "r/fortran",
+           type: .reddit,
+           url: "fortran",
+           imageName: NSImage(named: "js")!
+       ),
     ]
 
     func loadBlocklists(from jsonFilePath: String) {
         guard let data = FileManager.default.contents(atPath: jsonFilePath) else {
-            print("Blocklist JSON file not found.")
+          print("Blocklist JSON file not found at", jsonFilePath);
             return
         }
 
@@ -47,7 +80,10 @@ class FeedFetcher: ObservableObject {
                     DispatchQueue.main.async {
                         switch result {
                         case .success(let items):
-                            let filteredItems = self.filterItems(items, with: source.blocklist)
+                            var filteredItems = self.filterItems(items, with: source.blocklist)
+                            for i in 0..<filteredItems.count {
+                                filteredItems[i].imageName = source.imageName
+                            }
                             combinedItems.append(contentsOf: filteredItems)
                         case .failure(let error):
                             self.errorMessage = error.localizedDescription
@@ -61,7 +97,10 @@ class FeedFetcher: ObservableObject {
                     DispatchQueue.main.async {
                         switch result {
                         case .success(let items):
-                            let filteredItems = self.filterItems(items, with: source.blocklist)
+                            var filteredItems = self.filterItems(items, with: source.blocklist)
+                            for i in 0..<filteredItems.count {
+                                filteredItems[i].imageName = source.imageName
+                            }
                             combinedItems.append(contentsOf: filteredItems)
                         case .failure(let error):
                             self.errorMessage = error.localizedDescription

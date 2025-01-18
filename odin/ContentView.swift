@@ -6,11 +6,21 @@ struct ContentView: View {
     var body: some View {
         List(feedFetcher.feedItems) { item in
             VStack(alignment: .leading, spacing: 8) {
-                Text(item.title)
-                    .font(.headline)
-                Text(item.pubDate, format: Date.FormatStyle(date: .long, time: .shortened))
-                    .font(.subheadline)
-                    .foregroundColor(.gray)
+                HStack {
+                  Image(nsImage: item.imageName!)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 50, height: 50)
+                        .cornerRadius(8)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(item.title)
+                            .font(.headline)
+                        Text(item.pubDate, format: Date.FormatStyle(date: .long, time: .shortened))
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                }
+
                 Text(item.description)
                     .font(.body)
                     .foregroundColor(.secondary)

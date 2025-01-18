@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AppKit
 
 struct RSSItem: Identifiable {
     let id = UUID()
@@ -13,6 +14,7 @@ struct RSSItem: Identifiable {
     let description: String
     let link: String
     let pubDate: Date
+    var imageName: NSImage?
 }
 
 struct FeedSource {
@@ -20,6 +22,7 @@ struct FeedSource {
     let type: FeedType
     let url: String
     var blocklist: [String] = []
+    let imageName: NSImage
 }
 
 enum FeedType {
