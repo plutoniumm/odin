@@ -28,21 +28,18 @@ class RedditTransformer {
                     let items = children.compactMap { child -> RSSItem? in
                         guard let childData = child["data"] as? [String: Any],
                               let title = childData["title"] as? String,
+                              let body = childData["selftext"] as? String,
                               let createdUtc = childData["created_utc"] as? Double,
                               let permalink = childData["permalink"] as? String,
                               let url = childData["url"] as? String else {
                             return nil
                         }
 
-                        var body = (childData["selftext"] as? String) ?? ""
-                        let attributedBody: AttributedString
-                        do {
-                            attributedBody = try AttributedString(markdown: body)
-                            body = String(attributedBody.description)
-                        } catch {
-                            body = String(body)
-                        }
                         if !title.contains("http") && !body.contains("http") {
+                            return nil
+                        }
+
+                        if body.count > 500 {
                             return nil
                         }
 

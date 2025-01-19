@@ -1,8 +1,11 @@
+import MarkdownUI
 import SwiftUI
+import Cocoa
 
 struct ContentView: View {
     @StateObject private var feedFetcher = FeedFetcher()
 
+    let size: CGFloat = 25;
     var body: some View {
         List(feedFetcher.feedItems) { item in
             VStack(alignment: .leading, spacing: 8) {
@@ -10,7 +13,7 @@ struct ContentView: View {
                   Image(nsImage: item.imageName!)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 50, height: 50)
+                        .frame(width: size, height: size)
                         .cornerRadius(8)
                     VStack(alignment: .leading, spacing: 8) {
                         Text(item.title)
@@ -21,15 +24,16 @@ struct ContentView: View {
                     }
                 }
 
-                Text(item.description)
-                    .font(.body)
-                    .foregroundColor(.secondary)
+              Markdown(item.description)
+//                    .font(.body)
+//                    .foregroundColor(.secondary)
             }
             .padding(.vertical, 4)
             .onTapGesture(count: 2) {
                 if let url = URL(string: item.link) {
-                    // Uncomment this line if building for iOS
-                    // UIApplication.shared.open(url)
+                    if NSWorkspace.shared.open(url) {
+                        print("default browser was successfully opened")
+                    }
                 }
             }
         }

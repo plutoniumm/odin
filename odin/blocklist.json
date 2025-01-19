@@ -1,9 +1,11 @@
-
 {
-  "Construction Physics":[],
+  "Construction Physics": [],
   "Quanta Magazine": [],
   "Nautilus": [],
-  "r/javascript": ["[AskJS]"],
+  "r/javascript": [
+    "[AskJS]",
+    "recap for the week"
+  ],
   "r/fortran": [],
   "Terry Tao": []
 }

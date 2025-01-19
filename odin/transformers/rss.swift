@@ -23,16 +23,19 @@ class RSSTransformer {
                             let pubDate = item.pubDate
                         else { return nil }
 
-                        let plainDescription: String
+                        var desc: String
                         do {
-                            plainDescription = try SwiftSoup.parse(description).text()
+                            desc = try SwiftSoup.parse(description).text()
                         } catch {
-                            plainDescription = description
+                            desc = description
                         }
+                        let len = min(desc.count, 500)
+
+                        desc = String(desc[..<desc.index(desc.startIndex, offsetBy: len)])
 
                         return RSSItem(
                             title: title,
-                            description: plainDescription,
+                            description: desc,
                             link: link,
                             pubDate: pubDate
                         )

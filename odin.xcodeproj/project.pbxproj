@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		F65CB1972D3253C200DBF87E /* FeedKit in Frameworks */ = {isa = PBXBuildFile; productRef = F65CB1962D3253C200DBF87E /* FeedKit */; };
 		F692DD682D398C2600CD6732 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = F692DD672D398C2600CD6732 /* SwiftSoup */; };
+		F6E0D7B12D3C31510015ECD4 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = F6E0D7B02D3C31510015ECD4 /* MarkdownUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F6E0D7B12D3C31510015ECD4 /* MarkdownUI in Frameworks */,
 				F65CB1972D3253C200DBF87E /* FeedKit in Frameworks */,
 				F692DD682D398C2600CD6732 /* SwiftSoup in Frameworks */,
 			);
@@ -74,6 +76,7 @@
 			packageProductDependencies = (
 				F65CB1962D3253C200DBF87E /* FeedKit */,
 				F692DD672D398C2600CD6732 /* SwiftSoup */,
+				F6E0D7B02D3C31510015ECD4 /* MarkdownUI */,
 			);
 			productName = odin;
 			productReference = F65CB1812D32533100DBF87E /* odin.app */;
@@ -106,6 +109,7 @@
 			packageReferences = (
 				F65CB1952D3253C200DBF87E /* XCRemoteSwiftPackageReference "FeedKit" */,
 				F692DD662D398C2600CD6732 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
+				F6E0D7AF2D3C31510015ECD4 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F65CB1822D32533100DBF87E /* Products */;
@@ -352,6 +356,14 @@
 				minimumVersion = 2.7.6;
 			};
 		};
+		F6E0D7AF2D3C31510015ECD4 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/gonzalezreal/swift-markdown-ui";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -364,6 +376,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F692DD662D398C2600CD6732 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
 			productName = SwiftSoup;
+		};
+		F6E0D7B02D3C31510015ECD4 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F6E0D7AF2D3C31510015ECD4 /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
