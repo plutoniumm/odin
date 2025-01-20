@@ -2,52 +2,42 @@ import Foundation
 import FeedKit
 import SwiftSoup
 
-class RSSTransformer {
-    static func fetchFeed(urlString: String, completion: @escaping (Result<[RSSItem], Error>) -> Void) {
-        guard let url = URL(string: urlString) else {
-            completion(.failure(NSError(domain: "Invalid URL", code: -1, userInfo: nil)))
-            return
-        }
+func getRSS(source: FeedSource) async throws -> [RSSItem] {
+  let urlString = source.url
+  guard let url = URL(string: urlString) else {
+    return []
+  }
 
-        let parser = FeedParser(URL: url)
+  let parser = FeedParser(URL: url)
 
-        parser.parseAsync { result in
-            switch result {
-            case .success(let feed):
-                if let rssFeed = feed.rssFeed {
-                    let items = rssFeed.items?.compactMap { item -> RSSItem? in
-                        guard
-                            let title = item.title,
-                            let description = item.description,
-                            let link = item.link,
-                            let pubDate = item.pubDate
-                        else { return nil }
+  do {
+    let feed = try parser.parse().get().rssFeed
 
-                        var desc: String
-                        do {
-                            desc = try SwiftSoup.parse(description).text()
-                        } catch {
-                            desc = description
-                        }
-                        let len = min(desc.count, 500)
+    let items = feed?.items?.compactMap { item -> RSSItem? in
+      guard
+        let title = item.title,
+        let description = item.description,
+        let link = item.link,
+        let pubDate = item.pubDate
+      else { return nil }
 
-                        desc = String(desc[..<desc.index(desc.startIndex, offsetBy: len)])
+      var desc: String = description
+      do {
+        desc = try SwiftSoup.parse(description).text()
+      } catch {}
 
-                        return RSSItem(
-                            title: title,
-                            description: desc,
-                            link: link,
-                            pubDate: pubDate
-                        )
-                    } ?? []
-                    completion(.success(items))
-                } else {
-                    completion(.success([]))
-                }
+      return RSSItem(
+        name: source.name,
+        title: title,
+        description: desc,
+        link: link,
+        pubDate: pubDate,
+        imageName: source.imageName
+      )
+    } ?? []
+    return items
 
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
+  } catch {
+    return []
+  }
 }

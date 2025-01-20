@@ -1,0 +1,1 @@
+let PROXY: String = "https://x.manav.ch/p2/proxy?url="

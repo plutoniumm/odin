@@ -2,183 +2,87 @@ import Foundation
 import Combine
 import AppKit
 
+@MainActor
 class FeedFetcher: ObservableObject {
-    @Published var feedItems: [RSSItem] = []
-    @Published var isLoading: Bool = false
-    @Published var errorMessage: String?
+  @Published var feedItems: [RSSItem] = []
+  @Published var loading: Bool = false
+  @Published var errorMessage: String?
 
-    private var feedSources: [FeedSource] = [
-        FeedSource(
-            name: "Google Project Zero",
-            type: .rss,
-            url: "https://googleprojectzero.blogspot.com/feeds/posts/default?alt=rss",
-            imageName: NSImage(named: "p0")!
-        ),
-        FeedSource(
-            name: "The Pudding",
-            type: .rss,
-            url: "https://pudding.cool/rss.xml",
-            imageName: NSImage(named: "pudding")!
-        ),
-        FeedSource(
-            name: "Terry Tao",
-            type: .rss,
-            url: "https://mathstodon.xyz/@tao.rss",
-            imageName: NSImage(named: "ttao")!
-        ),
-        FeedSource(
-            name: "Quanta Mag: Mathematics",
-            type: .rss,
-            url: "https://www.quantamagazine.org/mathematics/feed/",
-            imageName: NSImage(named: "quanta")!
-        ),
-        FeedSource(
-            name: "Quanta Mag: Physics",
-            type: .rss,
-            url: "https://www.quantamagazine.org/physics/feed/",
-            imageName: NSImage(named: "quanta")!
-        ),
-        FeedSource(
-            name: "Quanta Mag: Computer Science",
-            type: .rss,
-            url: "https://www.quantamagazine.org/computer-science/feed/",
-            imageName: NSImage(named: "quanta")!
-        ),
-        FeedSource(
-            name: "Nautilus",
-            type: .rss,
-            url: "https://nautil.us/feed/",
-            imageName: NSImage(named: "nautilus")!
-        ),
-       FeedSource(
-           name: "r/javascript",
-           type: .reddit,
-           url: "javascript",
-           imageName: NSImage(named: "js")!
-       ),
-       FeedSource(
-           name: "r/fortran",
-           type: .reddit,
-           url: "fortran",
-           imageName: NSImage(named: "fortran")!
-       ),
-       FeedSource(
-           name: "r/rust",
-           type: .reddit,
-           url: "rust",
-           imageName: NSImage(named: "rust")!
-       ),
-       FeedSource(
-           name: "r/zig",
-           type: .reddit,
-           url: "zig",
-           imageName: NSImage(named: "zig")!
-       ),
-       FeedSource(
-           name: "r/swift",
-           type: .reddit,
-           url: "swift",
-           imageName: NSImage(named: "swift")!
-       ),
-       FeedSource(
-           name: "r/python",
-           type: .reddit,
-           url: "python",
-           imageName: NSImage(named: "python")!
-       ),
-       FeedSource(
-           name: "r/MachineLearning",
-           type: .reddit,
-           url: "MachineLearning",
-           imageName: NSImage(named: "ml")!
-       ),
-        FeedSource(
-            name: "r/hackernews",
-            type: .reddit,
-            url: "hackernews",
-            imageName: NSImage(named: "yc")!
-        ),
-    ]
+  private var feedSources: [FeedSource] = defaultSources()
 
-    func loadBlocklists(from jsonFilePath: String) {
-        guard let data = FileManager.default.contents(atPath: jsonFilePath) else {
-          print("Blocklist JSON file not found at", jsonFilePath);
-            return
-        }
-
-        do {
-            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: [String]] {
-                for (name, blocklist) in json {
-                    if let index = feedSources.firstIndex(where: { $0.name == name }) {
-                        feedSources[index].blocklist = blocklist
-                    }
-                }
-            }
-        } catch {
-            print("Error parsing blocklist JSON: \(error.localizedDescription)")
-        }
+  func loadBlocklists(from jsonFilePath: String) {
+    guard let data = FileManager.default.contents(atPath: jsonFilePath) else {
+      print("Blocklist JSON file not found at", jsonFilePath)
+      return
     }
 
-    func fetchFeeds() {
-        isLoading = true
-        errorMessage = nil
+    do {
+      if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: [String]] {
+        for (name, blocklist) in json {
+          if let index = feedSources.firstIndex(where: { $0.name == name }) {
+            feedSources[index].blocklist = blocklist
+          }
+        }
+      }
+    } catch {
+      print("Error parsing blocklist JSON: \(error.localizedDescription)")
+    }
+  }
 
-        let group = DispatchGroup()
-        var combinedItems: [RSSItem] = []
+  func fetchFeeds() async {
+    loading = true
+    errorMessage = nil
 
-        for source in feedSources {
-            group.enter()
+    var combined: [RSSItem] = []
+
+    await withTaskGroup(of: (String, Result<[RSSItem], Error>).self) { group in
+      for source in feedSources {
+        group.addTask {
+          do {
+            let items: [RSSItem]
             switch source.type {
             case .rss:
-                RSSTransformer.fetchFeed(urlString: source.url) { result in
-                  print("Rendering ", source.name);
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let items):
-                            var filteredItems = self.filterItems(items, with: source.blocklist)
-                            for i in 0..<filteredItems.count {
-                                filteredItems[i].imageName = source.imageName
-                            }
-                            combinedItems.append(contentsOf: filteredItems)
-                        case .failure(let error):
-                            self.errorMessage = error.localizedDescription
-                            print(source.name, error.localizedDescription)
-                        }
-                        group.leave()
-                    }
-                }
-
+                items = try await getRSS(source: source)
             case .reddit:
-                RedditTransformer.fetchFeed(subreddit: source.url) { result in
-                    DispatchQueue.main.async {
-                        switch result {
-                        case .success(let items):
-                            var filteredItems = self.filterItems(items, with: source.blocklist)
-                            for i in 0..<filteredItems.count {
-                                filteredItems[i].imageName = source.imageName
-                            }
-                            combinedItems.append(contentsOf: filteredItems)
-                        case .failure(let error):
-                            self.errorMessage = error.localizedDescription
-                            print(source.name, error.localizedDescription)
-                        }
-                        group.leave()
-                    }
-                }
+                items = try await getReddit(source: source)
             }
+            return (source.name, .success(items))
+          } catch {
+            return (source.name, .failure(error))
+          }
         }
+      }
 
-        group.notify(queue: .main) {
-            self.feedItems = combinedItems.sorted { $0.pubDate > $1.pubDate }
-            self.isLoading = false
+      for await (sourceName, result) in group {
+        switch result {
+          case .success(let items):
+            let filtered = self.process(items, blocklist: feedSources.first { $0.name == sourceName }?.blocklist ?? [])
+            combined.append(contentsOf: filtered)
+          case .failure(let error):
+            self.errorMessage = error.localizedDescription
+            print(sourceName, error.localizedDescription)
         }
+      }
     }
 
-    private func filterItems(_ items: [RSSItem], with blocklist: [String]) -> [RSSItem] {
-        return items.filter { item in
-            !blocklist.contains { blockWord in
-                item.title.contains(blockWord) || item.description.contains(blockWord)
-            }
-        }
+    self.feedItems = combined.sorted { $0.pubDate > $1.pubDate }
+    self.loading = false
+  }
+
+  private func process(_ items: [RSSItem], blocklist: [String]) -> [RSSItem] {
+    let limitDate = Date().addingTimeInterval(-7 * 86400) // 7 days ago
+
+    return items.filter { item in
+      if (item.description.count > 500) || (item.pubDate <= limitDate) {
+        return false
+      }
+
+      let isBlocked = blocklist.contains { blockWord in
+        item.title.contains(blockWord) || item.description.contains(blockWord)
+      }
+      if isBlocked { return false }
+
+      return true
     }
+  }
 }
