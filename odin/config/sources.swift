@@ -3,12 +3,12 @@ import AppKit
 
 func defaultSources() -> [FeedSource] {
     return [
-    FeedSource(
-        name: "Google Project Zero",
-        type: .rss,
-        url: "https://googleprojectzero.blogspot.com/feeds/posts/default?alt=rss",
-        imageName: NSImage(named: "p0")!
-    ),
+//    FeedSource(
+//        name: "Google Project Zero",
+//        type: .rss,
+//        url: "https://googleprojectzero.blogspot.com/feeds/posts/default?max-results=3&alt=rss",
+//        imageName: NSImage(named: "p0")!
+//    ),
     FeedSource(
         name: "The Pudding",
         type: .rss,
@@ -46,51 +46,9 @@ func defaultSources() -> [FeedSource] {
         imageName: NSImage(named: "nautilus")!
     ),
     FeedSource(
-        name: "r/javascript",
+        name: "Reddit Integrated",
         type: .reddit,
-        url: "javascript",
-        imageName: NSImage(named: "js")!
-    ),
-    FeedSource(
-        name: "r/fortran",
-        type: .reddit,
-        url: "fortran",
-        imageName: NSImage(named: "fortran")!
-    ),
-    FeedSource(
-        name: "r/rust",
-        type: .reddit,
-        url: "rust",
-        imageName: NSImage(named: "rust")!
-    ),
-    FeedSource(
-        name: "r/zig",
-        type: .reddit,
-        url: "zig",
-        imageName: NSImage(named: "zig")!
-    ),
-    FeedSource(
-        name: "r/swift",
-        type: .reddit,
-        url: "swift",
-        imageName: NSImage(named: "swift")!
-    ),
-    FeedSource(
-        name: "r/python",
-        type: .reddit,
-        url: "python",
-        imageName: NSImage(named: "python")!
-    ),
-    FeedSource(
-        name: "r/MachineLearning",
-        type: .reddit,
-        url: "MachineLearning",
-        imageName: NSImage(named: "ml")!
-    ),
-    FeedSource(
-        name: "r/hackernews",
-        type: .reddit,
-        url: "hackernews",
+        url: "user/xplutonium/m/home",
         imageName: NSImage(named: "yc")!
     ),
 ]

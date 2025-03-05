@@ -2,8 +2,8 @@ import Foundation
 
 func getReddit(source: FeedSource) async throws -> [RSSItem] {
   let subreddit = source.url
-  let redditURL = "https://www.reddit.com/r/\(subreddit)/.json?limit=20"
-  guard let url = URL(string: PROXY + redditURL) else {
+  let redditURL = "https://www.reddit.com/\(subreddit)/.json?limit=1000"
+  guard let url = URL(string: redditURL) else {
     return []
   }
 
@@ -16,15 +16,22 @@ func getReddit(source: FeedSource) async throws -> [RSSItem] {
     let items = children.compactMap { child -> RSSItem? in
       guard let childData = child["data"] as? [String: Any],
           let title = childData["title"] as? String,
-          let body = childData["selftext"] as? String,
+          var body = childData["selftext"] as? String,
           let createdUtc = childData["created_utc"] as? Double,
           let url = childData["url"] as? String else {
         return nil
       }
 
-      if !title.contains("https") && !body.contains("https") {
+
+      if
+           !title.contains("https")
+        && !body.contains("https")
+        && !url.contains("https")
+      {
         return nil
       }
+        
+      body = body.replacingOccurrences(of: "&amp;", with: "&")
 
       return RSSItem(
         name: source.name,

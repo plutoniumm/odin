@@ -43,6 +43,7 @@ struct ContentView: View {
                     .font(.body)
                     .lineLimit(3)
                     .truncationMode(.tail)
+//                    .markdownImageProvider(.webImage)
             }
             .padding(.vertical, 4)
             .onTapGesture(count: 2) {
@@ -55,12 +56,13 @@ struct ContentView: View {
         .toolbar {
             ToolbarItem {
               Button(action: {Task{ feedFetcher.fetchFeeds }}) {
-                    if feedFetcher.loading {
-                        ProgressView()
-                    } else {
-                        Label("Refresh", systemImage: "arrow.clockwise")
-                    }
-                }
+                  if feedFetcher.loading < 1 {
+                    ProgressView(value: feedFetcher.loading)
+                        .progressViewStyle(CircularProgressViewStyle())
+                  } else {
+                      Label("Refresh", systemImage: "arrow.clockwise")
+                  }
+              }
             }
 
         }

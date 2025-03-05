@@ -5,32 +5,14 @@ import AppKit
 @MainActor
 class FeedFetcher: ObservableObject {
   @Published var feedItems: [RSSItem] = []
-  @Published var loading: Bool = false
+  @Published var loading: Double = 0.0
   @Published var errorMessage: String?
+  
 
   private var feedSources: [FeedSource] = defaultSources()
 
-  func loadBlocklists(from jsonFilePath: String) {
-    guard let data = FileManager.default.contents(atPath: jsonFilePath) else {
-      print("Blocklist JSON file not found at", jsonFilePath)
-      return
-    }
-
-    do {
-      if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: [String]] {
-        for (name, blocklist) in json {
-          if let index = feedSources.firstIndex(where: { $0.name == name }) {
-            feedSources[index].blocklist = blocklist
-          }
-        }
-      }
-    } catch {
-      print("Error parsing blocklist JSON: \(error.localizedDescription)")
-    }
-  }
-
   func fetchFeeds() async {
-    loading = true
+    loading = (1/Double(feedSources.count));
     errorMessage = nil
 
     var combined: [RSSItem] = []
@@ -39,6 +21,7 @@ class FeedFetcher: ObservableObject {
       for source in feedSources {
         group.addTask {
           do {
+
             let items: [RSSItem]
             switch source.type {
             case .rss:
@@ -54,19 +37,19 @@ class FeedFetcher: ObservableObject {
       }
 
       for await (sourceName, result) in group {
-        switch result {
-          case .success(let items):
-            let filtered = self.process(items, blocklist: feedSources.first { $0.name == sourceName }?.blocklist ?? [])
-            combined.append(contentsOf: filtered)
-          case .failure(let error):
-            self.errorMessage = error.localizedDescription
-            print(sourceName, error.localizedDescription)
+          switch result {
+              case .success(let items):
+                let filtered = self.process(items, blocklist: feedSources.first { $0.name == sourceName }?.blocklist ?? [])
+                combined.append(contentsOf: filtered)
+              case .failure(let error):
+                self.errorMessage = error.localizedDescription
+                print(sourceName, error.localizedDescription)
+          }
         }
-      }
     }
 
     self.feedItems = combined.sorted { $0.pubDate > $1.pubDate }
-    self.loading = false
+    self.loading = 1
   }
 
   private func process(_ items: [RSSItem], blocklist: [String]) -> [RSSItem] {
